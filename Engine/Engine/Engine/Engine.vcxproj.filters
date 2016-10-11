@@ -36,6 +36,12 @@
     <ClInclude Include="systemclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="textureclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textureshaderclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="modelclass.cpp">
@@ -62,12 +68,24 @@
     <ClCompile Include="systemclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="textureclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="textureshaderclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="color.ps">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="color.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="texture.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="texture.ps">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
