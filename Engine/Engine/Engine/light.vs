@@ -28,9 +28,9 @@ PixelInputType LightVertexShader(VertexInputType input)
 
 	input.position.w = 1.0f;
 
-	input.position = mul(input.position, worldMatrix);
-	input.position = mul(output.position, viewMatrix);
-	input.position = mul(output.position, projectionMatrix);
+    output.position = mul(input.position, worldMatrix);
+	output.position = mul(output.position, viewMatrix);
+	output.position = mul(output.position, projectionMatrix);
 
 	output.tex = input.tex;
 

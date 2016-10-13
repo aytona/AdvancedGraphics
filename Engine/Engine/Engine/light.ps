@@ -22,7 +22,7 @@ float4 LightPixelShader(PixelInputType input) : SV_TARGET
 {
 	float4 textureColor;
 	float3 lightDir;
-	float lightIntesity;
+	float lightIntensity;
 	float4 color;
 
 	textureColor = shaderTexture.Sample(SampleType, input.tex);
