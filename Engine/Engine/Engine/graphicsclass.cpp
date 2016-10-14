@@ -46,7 +46,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
     if (!m_Model)
         return false;
 
-    result = m_Model->Initialize(m_D3D->GetDevice(), L"../Engine/data/seafloor.dds");
+    result = m_Model->Initialize(m_D3D->GetDevice(), "../Engine/data/cube.txt", L"../Engine/data/seafloor.dds");
     if (!result)
     {
         MessageBox(hwnd, L"Coult not initialize the model object", L"Error", MB_OK);
@@ -68,7 +68,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 	if (!m_Light)
 		return false;
 
-	m_Light->SetDiffuseColor(1.0f, 0.0f, 1.0f, 1.0f);
+	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_Light->SetDirection(0.0f, 0.0f, 1.0f);
 
 	return true;
