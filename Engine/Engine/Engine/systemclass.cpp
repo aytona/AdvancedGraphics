@@ -97,7 +97,7 @@ bool SystemClass::Frame()
 {
 	// Where all he processing of the application is done
 	bool result;
-	if (m_Input->isKeyDown(VK_ESCAPE))
+	if (m_Input->IsKeyDown(VK_ESCAPE))
 		return false;
 	result = m_Graphics->Frame();
 	if (!result)

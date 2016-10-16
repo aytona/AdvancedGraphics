@@ -34,7 +34,7 @@ void InputClass::KeyUp(unsigned int input)
 	return;
 }
 
-bool InputClass::isKeyDown(unsigned int key)
+bool InputClass::IsKeyDown(unsigned int key)
 {
 	return m_keys[key];
 }
