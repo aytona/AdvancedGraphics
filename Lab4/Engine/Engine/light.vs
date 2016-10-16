@@ -15,23 +15,23 @@ cbuffer CameraBuffer
 // TYPEDEFS
 struct VertexInputType
 {
-	float4 position : POSITION;
-	float2 tex : TEXCOORD0;
-	float3 normal : NORMAL;
+    float4 position : POSITION;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
 };
 
 struct PixelInputType
 {
-	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
-	float3 normal : NORMAL;
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
     float3 viewDirection : TEXCOORD1;
 };
 
 // Vertex Shader
 PixelInputType LightVertexShader(VertexInputType input)
 {
-	PixelInputType output;
+    PixelInputType output;
     float4 worldPosition;
 
     // Change vector to be 4 units for proper matrix calculations
@@ -39,13 +39,13 @@ PixelInputType LightVertexShader(VertexInputType input)
 
     // Calculate position of vertex
     output.position = mul(input.position, worldMatrix);
-	output.position = mul(output.position, viewMatrix);
-	output.position = mul(output.position, projectionMatrix);
+    output.position = mul(output.position, viewMatrix);
+    output.position = mul(output.position, projectionMatrix);
 
     // Store texture coord for pixel shader
 	output.tex = input.tex;
 
-	output.normal = mul(input.position, (float3x3)worldMatrix);
+	output.normal = mul(input.normal, (float3x3)worldMatrix);
 
 	output.normal = normalize(output.normal);
 

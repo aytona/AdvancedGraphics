@@ -31,8 +31,7 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 		return false;
 
     // Init the Direct3D object
-	result = m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED,
-        hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
+	result = m_D3D->Initialize(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR);
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize Direct3D", L"Error", MB_OK);
@@ -80,10 +79,10 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
     // Init light object
     m_Light->SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
-	m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light->SetDirection(0.0f, 0.0f, 1.0f);
+    m_Light->SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+    m_Light->SetDirection(0.0f, 0.0f, 1.0f);
     m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
-    m_Light->SetSpecularPower(35.0f);       // Lower power greater effect will be
+    m_Light->SetSpecularPower(32.0f);       // Lower power the greater the effect
 
 	return true;
 }

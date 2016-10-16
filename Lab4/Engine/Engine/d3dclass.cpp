@@ -23,8 +23,7 @@ D3DClass::~D3DClass()
 
 }
 
-bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd,
-	bool fullscreen, float screenDepth, float screenNear)
+bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
 {
 	// hwnd is to handle the window, rest are self explanatory
 	HRESULT result;
@@ -59,8 +58,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	if (FAILED(result))
 		return false;
 	// Get num of modes that fit DXGI_FORMAT_R8G8B8A8_UNORM
-	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
-        DXGI_ENUM_MODES_INTERLACED, &numModes, NULL);
+	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL);
 	if (FAILED(result))
 		return false;
 	// Create list of all possible display modes for the monitor/video card combo
@@ -68,8 +66,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	if (!displayModeList)
 		return false;
 	// Fill display mode list structures
-	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM,
-        DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList);
+	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, displayModeList);
 	if (FAILED(result))
 		return false;
 
@@ -142,15 +139,16 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 
 	// Use D3D_DRIVER_TYPE_REFERENCE if D11 isn't supported
 	// Else use D3D_DRIVER_TYPE_HARDWARE
-	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1,
-		D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
+	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
 	if (FAILED(result))
 		return false;
 
+    // Pointer to back buffer
 	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
 		return false;
 
+    // Create render target view with back buffer pointer
 	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
 	if (FAILED(result))
 		return false;
@@ -158,6 +156,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	backBufferPtr->Release();
 	backBufferPtr = 0;
 
+    // Setup depth buffer description
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 	depthBufferDesc.Width = screenWidth;
 	depthBufferDesc.Height = screenHeight;
@@ -198,14 +197,17 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	if (FAILED(result))
 		return false;
 
+    // Set depth stencil state
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
 
+    // Setup depth stencil view description
 	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
 	depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
-	result = m_device->CreateDepthStencilView(m_depthStencilBuffer,
-        &depthStencilViewDesc, &m_depthStencilView);
+
+    // Create depth stencil view
+	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView);
 	if (FAILED(result))
 		return false;
 
@@ -240,11 +242,9 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 
 	fieldOfView = (float)D3DX_PI / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
-	D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect,
-		screenNear, screenDepth);
+	D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
 	D3DXMatrixIdentity(&m_worldMatrix);    // Convert vertice of objects to vertice in 3D space
-	D3DXMatrixOrthoLH(&m_orthoMatrix, (float)screenWidth, (float)screenHeight,
-		screenNear, screenDepth);
+	D3DXMatrixOrthoLH(&m_orthoMatrix, (float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 	return true;
 }
 
@@ -254,6 +254,7 @@ void D3DClass::Shutdown()
 	// But needs to be in windowed mode first (or else it'll throw exceptions)
 	if (m_swapChain)
 		m_swapChain->SetFullscreenState(false, NULL);
+
 	if (m_rasterState)
 	{
 		m_rasterState->Release();

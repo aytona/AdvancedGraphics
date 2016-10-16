@@ -26,9 +26,10 @@ bool SystemClass::Initialize()
 	int screenWidth, screenHeight;
 	bool result;
 
-	//Initialization
 	screenWidth = 0;
 	screenHeight = 0;
+
+    // Init windows api
 	InitializeWindows(screenWidth, screenHeight);
 
 	m_Input = new InputClass;
@@ -36,12 +37,14 @@ bool SystemClass::Initialize()
 		return false;
 	m_Input->Initialize();
 
+    // Handles rendering all the graphics
 	m_Graphics = new GraphicsClass;
 	if (!m_Graphics)
 		return false;
 	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
 	if (!result)
 		return false;
+
 	return true;
 }
 
@@ -94,7 +97,7 @@ bool SystemClass::Frame()
 {
 	// Where all he processing of the application is done
 	bool result;
-	if (m_Input->isKeyDown(VK_ESCAPE))
+	if (m_Input->IsKeyDown(VK_ESCAPE))
 		return false;
 	result = m_Graphics->Frame();
 	if (!result)
@@ -126,9 +129,11 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	int posX, posY;
 
 	ApplicationHandle = this;
-	m_hinstance = GetModuleHandle(NULL);
-	m_applicationName = L"Engine";
-	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
+	m_hinstance = GetModuleHandle(NULL);    // Get instance of this application
+	m_applicationName = L"Engine";          // Name of application
+	
+    // Setup windows class with default settings
+    wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	wc.lpfnWndProc = WndProc;
 	wc.cbClsExtra = 0;
 	wc.cbWndExtra = 0;
@@ -152,8 +157,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 		dmScreenSettings.dmPelsWidth	= (unsigned long)screenWidth;
 		dmScreenSettings.dmPelsHeight	= (unsigned long)screenHeight;
 		dmScreenSettings.dmBitsPerPel	= 32;
-		dmScreenSettings.dmFields		= DM_BITSPERPEL | DM_PELSWIDTH 
-												| DM_PELSHEIGHT;
+		dmScreenSettings.dmFields		= DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 		ChangeDisplaySettings(&dmScreenSettings, CDS_FULLSCREEN);
 		posX = posY = 0;	// Top-left corner
 	}
@@ -173,10 +177,14 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	WS_POPUP, posX, posY, screenWidth, screenHeight, NULL, NULL,
 		m_hinstance, NULL);
 
+    // Bring window up on screen and set as main focus
 	ShowWindow(m_hwnd, SW_SHOW);
 	SetForegroundWindow(m_hwnd);
 	SetFocus(m_hwnd);
+
+    // Mouse cursor
 	ShowCursor(true);
+
 	return;
 }
 
