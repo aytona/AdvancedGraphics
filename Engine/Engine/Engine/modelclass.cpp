@@ -72,14 +72,15 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
     HRESULT result;
     int i;
 
+    // Create both vertex and index arrays
     vertices = new VertexType[m_vertexCount];
     if (!vertices)
         return false;
-
     indices = new unsigned long[m_indexCount];
     if (!indices)
         return false;
 
+    // Load vertex and index array with data
     for (i = 0; i < m_vertexCount; i++)
     {
         vertices[i].position = D3DXVECTOR3(m_model[i].x, m_model[i].y, m_model[i].z);
@@ -89,6 +90,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
         indices[i] = i;
     }
 
+    // Setup static vertex buffer description
     vertexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
     vertexBufferDesc.ByteWidth = sizeof(VertexType) * m_vertexCount;
     vertexBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -100,10 +102,12 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
     vertexData.SysMemPitch = 0;
     vertexData.SysMemSlicePitch = 0;
 
+    // Create vertex buffer
     result = device->CreateBuffer(&vertexBufferDesc, &vertexData, &m_vertexBuffer);
     if (FAILED(result))
         return false;
 
+    // Setup static index buffer description
     indexBufferDesc.Usage = D3D11_USAGE_DEFAULT;
     indexBufferDesc.ByteWidth = sizeof(unsigned long) * m_indexCount;
     indexBufferDesc.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -115,6 +119,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
     indexData.SysMemPitch = 0;
     indexData.SysMemSlicePitch = 0;
 
+    // Create index buffer
     result = device->CreateBuffer(&indexBufferDesc, &indexData, &m_indexBuffer);
     if (FAILED(result))
         return false;
@@ -151,8 +156,13 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
     stride = sizeof(VertexType);
     offset = 0;
 
+    // Set vertex buffer to active in the input assembler so it can be rendered
     deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+
+    // Set index buffer to active in the input assembler so it can be rendered
     deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+    // Set type of primitive that should be rendered from this vertex buffer
     deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
     return;
