@@ -9,6 +9,8 @@ GraphicsClass::GraphicsClass()
     m_Model = 0;
 	m_LightShader = 0;
 	m_Light = 0;
+    m_TextureShader = 0;
+    m_Bitmap = 0;
 }
 
 GraphicsClass::GraphicsClass(const GraphicsClass& other)
@@ -45,6 +47,19 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
     // Set initial position of camera
     m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+
+    // Create texture shader object
+    m_TextureShader = new TextureShaderClass;
+    if (!m_TextureShader)
+        return false;
+
+    // Init texture sahder object
+    result = m_TextureShader->Initialize(m_D3D->GetDevice(), hwnd);
+    if (!result)
+    {
+        MessageBox(hwnd, L"Could not initialize the texture shader object.", L"Error", MB_OK);
+        return false;
+    }
 
     // Create model object
     m_Model = new ModelClass;
@@ -84,11 +99,36 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
     m_Light->SetSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
     m_Light->SetSpecularPower(32.0f);       // Lower power the greater the effect
 
+    m_Bitmap = new BitmapClass;
+    if (!m_Bitmap)
+        return false;
+
+    result = m_Bitmap->Initialize(m_D3D->GetDevice(), screenWidth, screenHeight, L"../Engine/data/seafloor.dds", 256, 256);
+    if (!result)
+    {
+        MessageBox(hwnd, L"Could not initialize the bitmap object.", L"Error", MB_OK);
+        return false;
+    }
+
 	return true;
 }
 
 void GraphicsClass::Shutdown()
 {
+    if (m_Bitmap)
+    {
+        m_Bitmap->Shutdown();
+        delete m_Bitmap;
+        m_Bitmap = 0;
+    }
+
+    if (m_TextureShader)
+    {
+        m_TextureShader->Shutdown();
+        delete m_TextureShader;
+        m_TextureShader = 0;
+    }
+
 	if (m_Light)
 	{
 		delete m_Light;
@@ -140,7 +180,7 @@ bool GraphicsClass::Frame()
 
 bool GraphicsClass::Render(float rotation)
 {
-    D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix;
+    D3DXMATRIX viewMatrix, projectionMatrix, worldMatrix, orthoMatrix;
     bool result;
 
     // Clear buffers
@@ -152,6 +192,23 @@ bool GraphicsClass::Render(float rotation)
     m_Camera->GetViewMatrix(viewMatrix);
     m_D3D->GetWorldMatrix(worldMatrix);
     m_D3D->GetProjectionMatrix(projectionMatrix);
+
+    m_D3D->GetOrthoMatrix(orthoMatrix);
+
+    // Turn off the Z buffer to begin all 2D rendering
+    m_D3D->TurnZBufferOff();
+
+    // Put bitmap vertex and index buffers on the graphics pipeline to prepare for drawing
+    result = m_Bitmap->Render(m_D3D->GetDeviceContext(), 100, 100);
+    if (!result)
+        return false;
+
+    result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
+    if (!result)
+        return false;
+
+    // All 2D rendering completed
+    m_D3D->TurnZBufferOn();
     
     // Rotate the world matrix by the rotation value
 	D3DXMatrixRotationY(&worldMatrix, rotation);
