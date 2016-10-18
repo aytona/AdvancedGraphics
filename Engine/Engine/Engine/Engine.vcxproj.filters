@@ -48,6 +48,15 @@
     <ClInclude Include="textureshaderclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fontclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fontshaderclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="textclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="modelclass.cpp">
@@ -86,6 +95,15 @@
     <ClCompile Include="textureshaderclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="fontclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fontshaderclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="textclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="texture.vs">
@@ -100,9 +118,18 @@
     <None Include="light.ps">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="font.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="font.ps">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="cube.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="data\fontdata.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

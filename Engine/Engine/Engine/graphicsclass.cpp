@@ -11,6 +11,7 @@ GraphicsClass::GraphicsClass()
 	m_Light = 0;
     m_TextureShader = 0;
     m_Bitmap = 0;
+    m_Text = 0;
 }
 
 GraphicsClass::GraphicsClass(const GraphicsClass& other)
@@ -26,6 +27,7 @@ GraphicsClass::~GraphicsClass()
 bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 {
 	bool result;
+    D3DXMATRIX baseViewMatrix;
 
     // Create the Direct3D object
 	m_D3D = new D3DClass;
@@ -47,6 +49,22 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
     // Set initial position of camera
     m_Camera->SetPosition(0.0f, 0.0f, -10.0f);
+
+    m_Camera->Render();
+    m_Camera->GetViewMatrix(baseViewMatrix);
+
+    // Create text object
+    m_Text = new TextClass;
+    if (!m_Text)
+        return false;
+
+    // Init text object
+    result = m_Text->Initialize(m_D3D->GetDevice(), m_D3D->GetDeviceContext(), hwnd, screenWidth, screenHeight, baseViewMatrix);
+    if (!result)
+    {
+        MessageBox(hwnd, L"Could not initialize the text object.", L"Error", MB_OK);
+        return false;
+    }
 
     // Create texture shader object
     m_TextureShader = new TextureShaderClass;
@@ -115,6 +133,13 @@ bool GraphicsClass::Initialize(int screenWidth, int screenHeight, HWND hwnd)
 
 void GraphicsClass::Shutdown()
 {
+    if (m_Text)
+    {
+        m_Text->Shutdown();
+        delete m_Text;
+        m_Text = 0;
+    }
+
     if (m_Bitmap)
     {
         m_Bitmap->Shutdown();
@@ -206,6 +231,17 @@ bool GraphicsClass::Render(float rotation)
     result = m_TextureShader->Render(m_D3D->GetDeviceContext(), m_Bitmap->GetIndexCount(), worldMatrix, viewMatrix, orthoMatrix, m_Bitmap->GetTexture());
     if (!result)
         return false;
+
+    // Turn on alpha blending to start rendering text
+    m_D3D->TurnOnAlphaBlending();
+
+    // Render text strings
+    result = m_Text->Render(m_D3D->GetDeviceContext(), worldMatrix, orthoMatrix);
+    if (!result)
+        return false;
+
+    // Turn off alpha blending
+    m_D3D->TurnOffAlphaBlending();
 
     // All 2D rendering completed
     m_D3D->TurnZBufferOn();
