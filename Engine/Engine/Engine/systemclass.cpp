@@ -121,8 +121,10 @@ void SystemClass::Run()
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		if (msg.message == WM_QUIT)
-			done = true;
+        if (msg.message == WM_QUIT)
+        {
+            done = true;
+        }
         else
         {
             result = Frame();
@@ -172,40 +174,16 @@ bool SystemClass::Frame()
     if (!result)
         return false;
 
-#if 0   // Deprecated
-	if (m_Input->IsKeyDown(VK_ESCAPE))
-		return false;
-
-	result = m_Graphics->Frame();
-	if (!result)
-		return false;
-
-
     result = m_Graphics->Render();
     if (!result)
         return false;
-#endif
 
 	return true;
 }
 
- /* Deprecated since tut16 */
 LRESULT CALLBACK SystemClass::MessageHandler
 (HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
-#if 0
-	switch (umsg)
-	{
-		case WM_KEYDOWN:
-			m_Input->KeyDown((unsigned int)wparam);
-			return 0;
-		case WM_KEYUP:
-			m_Input->KeyUp((unsigned int)wparam);
-			return 0;
-		default:
-			return DefWindowProc(hwnd, umsg, wparam, lparam);
-	}
-#endif
     return DefWindowProc(hwnd, umsg, wparam, lparam);
 }
 
