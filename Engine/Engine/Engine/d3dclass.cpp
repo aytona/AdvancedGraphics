@@ -90,17 +90,6 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 		}
 	}
 
-	// Get video card description
-	result = adapter->GetDesc(&adapterDesc);
-	if (FAILED(result))
-		return false;
-	// Store dedicated v mem in megabytes
-	m_videoCardMemory = (int)(adapterDesc.DedicatedVideoMemory / 1024 / 1024);
-	// Store vCard name
-	error = wcstombs_s(&stringLength, m_videoCardDescription, 128, adapterDesc.Description, 128);
-	if (error != 0)
-		return false;
-
 	// Releasing structures and interfaces
 	delete[] displayModeList;
 	displayModeList = 0;
@@ -423,14 +412,6 @@ void D3DClass::GetWorldMatrix(D3DXMATRIX& worldMatrix)
 void D3DClass::GetOrthoMatrix(D3DXMATRIX& orthoMatrix)
 {
 	orthoMatrix = m_orthoMatrix;
-	return;
-}
-
-// Return vCard name and dedicated memory
-void D3DClass::GetVideoCardInfo(char* cardName, int& memory)
-{
-	strcpy_s(cardName, 128, m_videoCardDescription);
-	memory = m_videoCardMemory;
 	return;
 }
 

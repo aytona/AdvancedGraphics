@@ -7,6 +7,8 @@ SystemClass::SystemClass()
 	// assumes they were valid created objects. Also good practice.
 	m_Input = 0;
 	m_Graphics = 0;
+    m_Timer = 0;
+    m_Position = 0;
 }
 
 SystemClass::SystemClass(const SystemClass& other)
@@ -32,10 +34,18 @@ bool SystemClass::Initialize()
     // Init windows api
 	InitializeWindows(screenWidth, screenHeight);
 
+    // Create input object
 	m_Input = new InputClass;
 	if (!m_Input)
 		return false;
-	m_Input->Initialize();
+
+    // Init input object
+	result = m_Input->Initialize(m_hinstance, m_hwnd, screenWidth, screenHeight);
+    if (!result)
+    {
+        MessageBox(m_hwnd, L"Could not initialize the input object.", L"Error", MB_OK);
+        return false;
+    }
 
     // Handles rendering all the graphics
 	m_Graphics = new GraphicsClass;
@@ -45,12 +55,42 @@ bool SystemClass::Initialize()
 	if (!result)
 		return false;
 
+    // Create timer object
+    m_Timer = new TimerClass;
+    if (!m_Timer)
+        return false;
+
+    // Initialize timer object
+    result = m_Timer->Initialize();
+    if (!result)
+    {
+        MessageBox(m_hwnd, L"Could not initialize the Timer Object.", L"Error", MB_OK);
+        return false;
+    }
+
+    // Create position object
+    m_Position = new PositionClass;
+    if (!m_Position)
+        return false;
+
 	return true;
 }
 
 void SystemClass::Shutdown()
 {
 	// Releases everything asociated with graphics and input object
+    if (m_Position)
+    {
+        delete m_Position;
+        m_Position = 0;
+    }
+
+    if (m_Timer)
+    {
+        delete m_Timer;
+        m_Timer = 0;
+    }
+
 	if (m_Graphics)
 	{
 		m_Graphics->Shutdown();
@@ -83,12 +123,19 @@ void SystemClass::Run()
 		}
 		if (msg.message == WM_QUIT)
 			done = true;
-		else
-		{
-			result = Frame();
-			if (!result)
-				done = true;
-		}
+        else
+        {
+            result = Frame();
+            if (!result)
+            {
+                MessageBox(m_hwnd, L"Frame Processing Failed", L"Error", MB_OK);
+                done = true;
+            }
+        }
+        if (m_Input->IsEscapePressed())
+        {
+            done = true;
+        }
 	}
 	return;
 }
@@ -96,18 +143,57 @@ void SystemClass::Run()
 bool SystemClass::Frame()
 {
 	// Where all he processing of the application is done
-	bool result;
+	bool keyDown, result;
+    float rotationY;
+
+    // Update system stats
+    m_Timer->Frame();
+
+    // Do input frame processing
+    result = m_Input->Frame();
+    if (!result)
+        return false;
+
+    // Set frame time
+    m_Position->SetFrameTime(m_Timer->GetTime());
+
+    // Check key pressed
+    keyDown = m_Input->IsLeftArrowPressed();
+    m_Position->TurnLeft(keyDown);
+
+    keyDown = m_Input->IsRightArrowPressed();
+    m_Position->TurnRight(keyDown);
+
+    // Get current view point rotation
+    m_Position->GetRotation(rotationY);
+
+    // Frame processing for graphics object
+    result = m_Graphics->Frame(rotationY);
+    if (!result)
+        return false;
+
+#if 0   // Deprecated
 	if (m_Input->IsKeyDown(VK_ESCAPE))
 		return false;
+
 	result = m_Graphics->Frame();
 	if (!result)
 		return false;
+
+
+    result = m_Graphics->Render();
+    if (!result)
+        return false;
+#endif
+
 	return true;
 }
 
+ /* Deprecated since tut16 */
 LRESULT CALLBACK SystemClass::MessageHandler
 (HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
+#if 0
 	switch (umsg)
 	{
 		case WM_KEYDOWN:
@@ -119,7 +205,10 @@ LRESULT CALLBACK SystemClass::MessageHandler
 		default:
 			return DefWindowProc(hwnd, umsg, wparam, lparam);
 	}
+#endif
+    return DefWindowProc(hwnd, umsg, wparam, lparam);
 }
+
 
 void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 {

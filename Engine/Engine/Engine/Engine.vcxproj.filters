@@ -42,12 +42,6 @@
     <ClInclude Include="lightclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bitmapclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="textureshaderclass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="fontclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -55,6 +49,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="textclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="frustumclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="modellistclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="positionclass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timerclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,12 +95,6 @@
     <ClCompile Include="lightclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="bitmapclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="textureshaderclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="fontclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -104,14 +104,20 @@
     <ClCompile Include="textclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="frustumclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="modellistclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="positionclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="timerclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="texture.vs">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="texture.ps">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="light.vs">
       <Filter>Resource Files</Filter>
     </None>
@@ -126,10 +132,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="cube.txt">
+    <Text Include="data\fontdata.txt">
       <Filter>Resource Files</Filter>
     </Text>
-    <Text Include="data\fontdata.txt">
+    <Text Include="data\sphere.txt">
       <Filter>Resource Files</Filter>
     </Text>
   </ItemGroup>

@@ -37,50 +37,29 @@ void CameraClass::SetRotation(float x, float y, float z)
     return;
 }
 
-D3DXVECTOR3 CameraClass::GetPosition()
-{
-    return D3DXVECTOR3(m_positionX, m_positionY, m_positionZ);
-}
-
-D3DXVECTOR3 CameraClass::GetRotation()
-{
-    return D3DXVECTOR3(m_rotationX, m_rotationY, m_rotationZ);
-}
-
 void CameraClass::Render()
 {
-    D3DXVECTOR3 up, position, lookAt;
-    float yaw, pitch, roll;
-    D3DXMATRIX rotationMatrix;
+    D3DXVECTOR3 up;
+    D3DXVECTOR3 position;
+    D3DXVECTOR3 lookAt;
+    float radians;
 
     up.x = 0.0f;
     up.y = 1.0f;
     up.z = 0.0f;
 
-    // Setup position of camera in the world
+    // Setup position of camera in world
     position.x = m_positionX;
     position.y = m_positionY;
     position.z = m_positionZ;
 
-    lookAt.x = 0.0f;
-    lookAt.y = 0.0f;
-    lookAt.z = 1.0f;
+    radians = m_rotationY * 0.0174532925f;
 
-    // Set yaw(Y), pitch(X), roll(Z) rotations in radius
-    pitch = m_rotationX * 0.0174532925f;
-    yaw = m_rotationY * 0.0174532925f;
-    roll = m_rotationZ * 0.0174532925f;
+    // Setup where camera is looking
+    lookAt.x = sinf(radians) + m_positionX;
+    lookAt.y = m_positionY;
+    lookAt.z = cosf(radians) + m_positionZ;
 
-    // Create rotation matrix
-    D3DXMatrixRotationYawPitchRoll(&rotationMatrix, yaw, pitch, roll);
-
-    D3DXVec3TransformCoord(&lookAt, &lookAt, &rotationMatrix);
-    D3DXVec3TransformCoord(&up, &up, &rotationMatrix);
-
-    // Translate camera position to location of viewer
-    lookAt = position + lookAt;
-
-    // Create view matrix
     D3DXMatrixLookAtLH(&m_viewMatrix, &position, &lookAt, &up);
 
     return;

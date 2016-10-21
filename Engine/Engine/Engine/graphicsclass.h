@@ -4,9 +4,9 @@
 #include "modelclass.h"
 #include "lightshaderclass.h"
 #include "lightclass.h"
-#include "textureshaderclass.h"
-#include "bitmapclass.h"
 #include "textclass.h"
+#include "modellistclass.h"
+#include "frustumclass.h"
 
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -22,10 +22,8 @@ public:
 
 	bool Initialize(int, int, HWND);
 	void Shutdown();
-	bool Frame();
-
-private:
-	bool Render(float);
+    bool Frame(float);
+    bool Render();
 
 private:
 	D3DClass* m_D3D;
@@ -33,7 +31,7 @@ private:
     ModelClass* m_Model;
 	LightShaderClass* m_LightShader;
 	LightClass* m_Light;
-    TextureShaderClass* m_TextureShader;
-    BitmapClass* m_Bitmap;
     TextClass* m_Text;
+    ModelListClass* m_ModelList;
+    FrustumClass* m_Frustum;
 };

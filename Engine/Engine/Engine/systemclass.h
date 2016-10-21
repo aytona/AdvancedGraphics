@@ -3,6 +3,8 @@
 #include <Windows.h>    // Create and destroy windows
 #include "inputclass.h"
 #include "graphicsclass.h"
+#include "timerclass.h"
+#include "positionclass.h"
 
 class SystemClass
 {
@@ -32,6 +34,8 @@ private:
 	// Pointers that will handle Input and Graphics respectively
 	InputClass* m_Input;
 	GraphicsClass* m_Graphics;
+    TimerClass* m_Timer;
+    PositionClass* m_Position;
 };
 
 // To re-direct the windows system messaging into MessageHandler
