@@ -3,9 +3,12 @@
 ColorShaderClass::ColorShaderClass()
 {
     m_vertexShader = 0;
+	m_hullShader = 0;
+	m_domainShader = 0;
     m_pixelShader = 0;
     m_layout = 0;
     m_matrixBuffer = 0;
+	m_tessellationBuffer = 0;
 }
 
 ColorShaderClass::ColorShaderClass(const ColorShaderClass& other)
@@ -22,7 +25,7 @@ bool ColorShaderClass::Initialize(ID3D11Device* device, HWND hwnd)
 {
     bool result;
 
-    result = InitializeShader(device, hwnd, L"../Engine/color.vs", L"../Engine/color.ps");
+    result = InitializeShader(device, hwnd, L"../Engine/color.vs", L"../Engine/color.hs", L"../Engine/color.ds", L"../Engine/color.ps");
     if (!result)
         return false;
 
@@ -36,11 +39,11 @@ void ColorShaderClass::Shutdown()
 }
 
 bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix,
-    D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix)
+    D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, float tessellationAmount)
 {
     bool result;
 
-    result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix);
+    result = SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, tessellationAmount);
     if (!result)
         return false;
 
@@ -48,18 +51,23 @@ bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount
     return true;
 }
 
-bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* psFilename)
+bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* vsFilename, WCHAR* hsFilename, WCHAR* dsFilename, WCHAR* psFilename)
 {
     HRESULT result;
     ID3D10Blob* errorMessage;
     ID3D10Blob* vertexShaderBuffer;
+	ID3D10Blob* hullShaderBuffer;
+	ID3D10Blob* domainShaderBuffer;
     ID3D10Blob* pixelShaderBuffer;
     D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
     unsigned int numElements;
     D3D11_BUFFER_DESC matrixBufferDesc;
+	D3D11_BUFFER_DESC tessellationBufferDesc;
 
     errorMessage = 0;
     vertexShaderBuffer = 0;
+	hullShaderBuffer = 0;
+	domainShaderBuffer = 0;
     pixelShaderBuffer = 0;
 
     result = D3DX11CompileFromFile(vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
@@ -72,6 +80,28 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
             MessageBox(hwnd, vsFilename, L"Missing Shader File", MB_OK);
         return false;
     }
+
+	result = D3DX11CompileFromFile(hsFilename, NULL, NULL, "ColorHullShader", "hs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &hullShaderBuffer, &errorMessage, NULL);
+	if (FAILED(result)) {
+		if (errorMessage) {
+			OutputShaderErrorMessage(errorMessage, hwnd, hsFilename);
+		}
+		else {
+			MessageBox(hwnd, hsFilename, L"Missing Shader File", MB_OK);
+		}
+		return false;
+	}
+
+	result = D3DX11CompileFromFile(dsFilename, NULL, NULL, "ColorDomainShader", "ds_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &domainShaderBuffer, &errorMessage, NULL);
+	if (FAILED(result)) {
+		if (errorMessage) {
+			OutputShaderErrorMessage(errorMessage, hwnd, dsFilename);
+		}
+		else {
+			MessageBox(hwnd, dsFilename, L"Missing Shader File", MB_OK);
+		}
+		return false;
+	}
 
     result = D3DX11CompileFromFile(psFilename, NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
         &pixelShaderBuffer, &errorMessage, NULL);
@@ -87,6 +117,14 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
     result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
     if (FAILED(result))
         return false;
+
+	result = device->CreateHullShader(hullShaderBuffer->GetBufferPointer(), hullShaderBuffer->GetBufferSize(), NULL, &m_hullShader);
+	if (FAILED(result))
+		return false;
+
+	result = device->CreateDomainShader(domainShaderBuffer->GetBufferPointer(), domainShaderBuffer->GetBufferSize(), NULL, &m_domainShader);
+	if (FAILED(result))
+		return false;
 
     result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
     if (FAILED(result))
