@@ -1,11 +1,3 @@
-// GLOBAL
-cbuffer MatrixBuffer
-{
-    matrix worldMatrix;
-    matrix viewMatrix;
-    matrix projectionMatrix;
-};
-
 // TYPEDEF
 struct VertexInputType
 {
