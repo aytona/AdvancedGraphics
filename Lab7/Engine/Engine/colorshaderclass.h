@@ -18,7 +18,7 @@ private:
 
 	struct TessellationBufferType
 	{
-		float tesselationAmount;
+        float tessellationAmount;
 		D3DXVECTOR3 padding;
 	};
 

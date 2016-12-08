@@ -38,8 +38,7 @@ void ColorShaderClass::Shutdown()
     return;
 }
 
-bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix,
-    D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, float tessellationAmount)
+bool ColorShaderClass::Render(ID3D11DeviceContext* deviceContext, int indexCount, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, float tessellationAmount)
 {
     bool result;
 
@@ -70,8 +69,8 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 	domainShaderBuffer = 0;
     pixelShaderBuffer = 0;
 
-    result = D3DX11CompileFromFile(vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
-        &vertexShaderBuffer, &errorMessage, NULL);
+    // Compile vertex shader
+    result = D3DX11CompileFromFile(vsFilename, NULL, NULL, "ColorVertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &vertexShaderBuffer, &errorMessage, NULL);
     if (FAILED(result))
     {
         if (errorMessage)
@@ -81,6 +80,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
         return false;
     }
 
+    // Compile hull shader
 	result = D3DX11CompileFromFile(hsFilename, NULL, NULL, "ColorHullShader", "hs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &hullShaderBuffer, &errorMessage, NULL);
 	if (FAILED(result)) {
 		if (errorMessage) {
@@ -92,6 +92,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 		return false;
 	}
 
+    // Compile domain shader
 	result = D3DX11CompileFromFile(dsFilename, NULL, NULL, "ColorDomainShader", "ds_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &domainShaderBuffer, &errorMessage, NULL);
 	if (FAILED(result)) {
 		if (errorMessage) {
@@ -103,8 +104,8 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 		return false;
 	}
 
-    result = D3DX11CompileFromFile(psFilename, NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL,
-        &pixelShaderBuffer, &errorMessage, NULL);
+    // Compile pixel shader
+    result = D3DX11CompileFromFile(psFilename, NULL, NULL, "ColorPixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, NULL, &pixelShaderBuffer, &errorMessage, NULL);
     if (FAILED(result))
     {
         if (errorMessage)
@@ -114,6 +115,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
         return false;
     }
 
+    // Creating all shaders from the buffer
     result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
     if (FAILED(result))
         return false;
@@ -130,6 +132,7 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
     if (FAILED(result))
         return false;
 
+    // Vertex input layout description
     polygonLayout[0].SemanticName = "POSITION";
     polygonLayout[0].SemanticIndex = 0;
     polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
@@ -148,17 +151,23 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
 
     numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
 
-    result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(),
-        vertexShaderBuffer->GetBufferSize(), &m_layout);
+    result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), &m_layout);
     if (FAILED(result))
         return false;
 
     vertexShaderBuffer->Release();
     vertexShaderBuffer = 0;
 
+    hullShaderBuffer->Release();
+    hullShaderBuffer = 0;
+
+    domainShaderBuffer->Release();
+    domainShaderBuffer = 0;
+
     pixelShaderBuffer->Release();
     pixelShaderBuffer = 0;
 
+    // Dynamic matrix constant buffer description in domain shader
     matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
     matrixBufferDesc.ByteWidth = sizeof(MatrixBufferType);
     matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -170,26 +179,56 @@ bool ColorShaderClass::InitializeShader(ID3D11Device* device, HWND hwnd, WCHAR* 
     if (FAILED(result))
         return false;
 
+    // Dynamic tessellation constant buffer description in hull shader
+    tessellationBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+    tessellationBufferDesc.ByteWidth = sizeof(TessellationBufferType);
+    tessellationBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    tessellationBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    tessellationBufferDesc.MiscFlags = 0;
+    tessellationBufferDesc.StructureByteStride = 0;
+
+    result = device->CreateBuffer(&tessellationBufferDesc, NULL, &m_tessellationBuffer);
+    if (FAILED(result))
+        return false;
+
     return true;
 }
 
 void ColorShaderClass::ShutdownShader()
 {
+    if (m_tessellationBuffer) {
+        m_tessellationBuffer->Release();
+        m_tessellationBuffer = 0;
+    }
+
     if (m_matrixBuffer)
     {
         m_matrixBuffer->Release();
         m_matrixBuffer = 0;
     }
+
     if (m_layout)
     {
         m_layout->Release();
         m_layout = 0;
     }
+
     if (m_pixelShader)
     {
         m_pixelShader->Release();
         m_pixelShader = 0;
     }
+
+    if (m_domainShader) {
+        m_domainShader->Release();
+        m_domainShader = 0;
+    }
+
+    if (m_hullShader) {
+        m_hullShader->Release();
+        m_hullShader = 0;
+    }
+
     if (m_vertexShader)
     {
         m_vertexShader->Release();
@@ -220,13 +259,13 @@ void ColorShaderClass::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND h
     return;
 }
 
-bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix,
-    D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix)
+bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, D3DXMATRIX worldMatrix, D3DXMATRIX viewMatrix, D3DXMATRIX projectionMatrix, float tessellationAmount)
 {
     HRESULT result;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     MatrixBufferType* dataPtr;
     unsigned int bufferNumber;
+    TessellationBufferType* dataPtr2;
 
     D3DXMatrixTranspose(&worldMatrix, &worldMatrix);
     D3DXMatrixTranspose(&viewMatrix, &viewMatrix);
@@ -244,18 +283,39 @@ bool ColorShaderClass::SetShaderParameters(ID3D11DeviceContext* deviceContext, D
     deviceContext->Unmap(m_matrixBuffer, 0);
 
     bufferNumber = 0;
-    deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+    deviceContext->DSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+
+    result = deviceContext->Map(m_tessellationBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    if (FAILED(result))
+        return false;
+
+    dataPtr2 = (TessellationBufferType*)mappedResource.pData;
+    dataPtr2->tessellationAmount = tessellationAmount;
+    dataPtr2->padding = D3DXVECTOR3(0.0f, 0.0f, 0.0f);
+
+    deviceContext->Unmap(m_tessellationBuffer, 0);
+
+    // Set position of the tessellation constant buffer in the hull shader
+    bufferNumber = 0;
+
+    // Set tessellation constant buffer in hull shader with updated values
+    deviceContext->HSSetConstantBuffers(bufferNumber, 1, &m_tessellationBuffer);
 
     return true;
 }
 
 void ColorShaderClass::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
 {
+    // Set vertex input layout
     deviceContext->IASetInputLayout(m_layout);
 
+    // Set shaders that will be used in render
     deviceContext->VSSetShader(m_vertexShader, NULL, 0);
+    deviceContext->HSSetShader(m_hullShader, NULL, 0);
+    deviceContext->DSSetShader(m_domainShader, NULL, 0);
     deviceContext->PSSetShader(m_pixelShader, NULL, 0);
 
+    // Render
     deviceContext->DrawIndexed(indexCount, 0, 0);
 
     return;

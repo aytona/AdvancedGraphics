@@ -31,7 +31,7 @@ ConstantOutputType ColorPatchConstantFunction(InputPatch<HullInputType, 3> input
 
 	output.edges[0] = tessellationAmount;
 	output.edges[1] = tessellationAmount;
-	output.edges[3] = tessellationAmount;
+	output.edges[2] = tessellationAmount;
 
 	output.inside = tessellationAmount;
 
@@ -44,12 +44,11 @@ ConstantOutputType ColorPatchConstantFunction(InputPatch<HullInputType, 3> input
 [outputtopology("triangle_cw")]
 [outputcontrolpoints(3)]
 [patchconstantfunc("ColorPatchConstantFunction")]
-
-HullOutputType ColorHullShader(InputPatch>HullInputType, 3> patch, uint pointId : SV_OutputControlPointID, uint patchId : SV_PrimitiveID)
+HullOutputType ColorHullShader(InputPatch<HullInputType, 3> patch, uint pointId : SV_OutputControlPointID, uint patchId : SV_PrimitiveID)
 {
 	HullOutputType output;
 
-	output.position = patchp[pointId].position;
+	output.position = patch[pointId].position;
 	output.color = patch[pointId].color;
 
 	return output;

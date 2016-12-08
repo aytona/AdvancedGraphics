@@ -15,8 +15,6 @@ HullInputType ColorVertexShader(VertexInputType input)
 {
     HullInputType output;
 
-    input.position.w = 1.0f;
-
     // Pass vertices and color data through to hull shader
     output.position = input.position;
     output.color = input.color;

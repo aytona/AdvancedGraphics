@@ -140,7 +140,7 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 
     deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
     deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_3_CONTROL_POINT_PATCHLIST);
 
     return;
 }

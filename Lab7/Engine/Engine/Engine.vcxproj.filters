@@ -15,22 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="modelclass.h">
+    <ClInclude Include="graphicsclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="colorshaderclass.h">
+    <ClInclude Include="inputclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="cameraclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="graphicsclass.h">
+    <ClInclude Include="colorshaderclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="d3dclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="inputclass.h">
+    <ClInclude Include="modelclass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="systemclass.h">
@@ -38,25 +38,25 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="modelclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="colorshaderclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="cameraclass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="d3dclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphicsclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="inputclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="cameraclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="colorshaderclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="d3dclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="modelclass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="systemclass.cpp">
@@ -68,6 +68,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="color.vs">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="color.ds">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="color.hs">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
